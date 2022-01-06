@@ -1,0 +1,228 @@
+# Kong for Kubernetes with Kong Enterprise with Enterprise features enabled and
+# exposed via TLS-enabled Ingresses. Before installing:
+# * Several settings (search for the string "CHANGEME") require user-provided
+#   Secrets. These Secrets must be created before installation.
+# * Ingresses reference example "<service>.kong.CHANGEME.example" hostnames. These must
+#   be changed to an actual hostname that resolve to your proxy.
+# * Ensure that your session configurations create cookies that are usable
+#   across your services. The admin session configuration must create cookies
+#   that are sent to both the admin API and Kong Manager, and any Dev Portal
+#   instances with authentication must create cookies that are sent to both
+#   the Portal and Portal API.
+
+image:
+  repository: kong/kong-gateway
+  tag: 2.7.0.0-alpine
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - bintray-kong
+
+env:
+  database: postgres
+  proxy_access_log: /dev/stdout
+  admin_access_log: /dev/stdout
+  admin_gui_access_log: /dev/stdout
+  portal_api_access_log: /dev/stdout
+  proxy_error_log: /dev/stderr
+  admin_error_log: /dev/stderr
+  admin_gui_error_log: /dev/stderr
+  portal_api_error_log: /dev/stderr
+  prefix: /kong_prefix/
+  ontrusted_lua: on
+
+  proxy_url: http://1.2.3.4
+  admin_api_uri: http://1.2.3.4:8001
+  admin_gui_url: http://1.2.3.4:8002
+  portal_gui_host: 1.2.3.4:8003
+  portal_api_url: http://1.2.3.4:8004
+  portal_gui_protocol: http
+  
+  #Database Information
+  pg_user: kong
+  pg_database: kong
+  pg_password: kong
+  
+  # Super User Password
+  password: kong
+  #password:
+  #  valueFrom:
+  #    secretKeyRef:
+  #      name: kong-enterprise-superuser-password #CHANGEME
+  #      key: kong-password #CHANGEME
+
+## Information needed for sessions (RBAC in Manager and/or Dev Portal session)
+#  portal_session_conf:
+#    valueFrom:
+#      secretKeyRef:
+#        name: kong-session-config
+#        key: portal_session_conf
+#  session_conf_secret:
+#    valueFrom:
+#      secretKeyRef:
+#        name: kong-session-config
+#        key: admin_gui_session_conf
+#  admin_gui_session_conf:
+#    valueFrom:
+#      secretKeyRef:
+#        name: kong-session-config
+#        key: admin_gui_session_conf
+
+
+admin:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+  http:
+    enabled: true
+    servicePort: 8001
+    containerPort: 8001
+  tls:
+    enabled: false
+    servicePort: 8444
+    containerPort: 8444
+    parameters:
+      - http2
+  ingress:
+    enabled: false
+    tls: CHANGEME-admin-tls-secret
+    hostname: admin.kong.CHANGEME.example
+    annotations:
+      kubernetes.io/ingress.class: "kong"
+    path: /
+proxy:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+  http:
+    enabled: true
+    servicePort: 80
+    containerPort: 8000
+    parameters: []
+  tls:
+    enabled: false
+    servicePort: 443
+    containerPort: 8443
+    parameters:
+      - http2
+  stream: {}
+  ingress:
+    enabled: false
+    annotations: {}
+    path: /
+  externalIPs: []
+enterprise:
+  enabled: true
+  # CHANGEME: https://github.com/Kong/charts/blob/main/charts/kong/README.md#kong-enterprise-license
+  license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+  portal:
+    enabled: true
+  rbac:
+    enabled: false
+    admin_gui_auth: basic-auth
+    session_conf_secret: kong-session-config
+    admin_gui_auth_conf_secret: CHANGEME-admin-gui-auth-conf-secret
+  smtp:
+    enabled: false
+    portal_emails_from: none@example.com
+    portal_emails_reply_to: none@example.com
+    admin_emails_from: none@example.com
+    admin_emails_reply_to: none@example.com
+    smtp_admin_emails: none@example.com
+    smtp_host: smtp.example.com
+    smtp_port: 587
+    smtp_auth_type: ''
+    smtp_ssl: nil
+    smtp_starttls: true
+    auth:
+      smtp_username: '' # e.g. postmaster@example.com
+      smtp_password_secret: CHANGEME-smtp-password
+manager:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+  http:
+    enabled: true
+    servicePort: 8002
+    containerPort: 8002
+  tls:
+    enabled: false
+    servicePort: 8445
+    containerPort: 8445
+    parameters:
+      - http2
+  ingress:
+    enabled: false
+    tls: CHANGEME-manager-tls-secret
+    hostname: manager.kong.CHANGEME.example
+    annotations: {}
+    path: /
+  externalIPs: []
+portal:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+  http:
+    enabled: true
+    servicePort: 8003
+    containerPort: 8003
+    parameters: []
+  tls:
+    enabled: false
+    servicePort: 8446
+    containerPort: 8446
+    parameters:
+      - http2
+  ingress:
+    enabled: false
+    tls: CHANGEME-portal-tls-secret
+    hostname: portal.kong.CHANGEME.example
+    annotations:
+      kubernetes.io/ingress.class: "kong"
+    path: /
+  externalIPs: []
+portalapi:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    kubernetes.io/ingress.class: alb
+  http:
+    enabled: true
+    servicePort: 8004
+    containerPort: 8004
+    parameters: []
+  tls:
+    enabled: false
+    servicePort: 8447
+    containerPort: 8447
+    parameters:
+      - http2
+  ingress:
+    enabled: false
+    tls: CHANGEME-portalapi-tls-secret
+    hostname: portalapi.kong.CHANGEME.example
+    annotations:
+      kubernetes.io/ingress.class: "kong"
+    path: /
+  externalIPs: []
+postgresql:
+  enabled: true
+  postgresqlUsername: kong
+  postgresqlDatabase: kong
+  postgresqlPassword: kong
+  service:
+    port: 5432
+ingressController:
+  enabled: false
+  installCRDs: false
+  env:
+    kong_admin_token:
+      valueFrom:
+        secretKeyRef:
+          name: kong-enterprise-superuser-password #CHANGEME
+          key: password #CHANGEME

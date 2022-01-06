@@ -1,0 +1,7 @@
+{
+  "cookie_name": "admin_session",
+  "secret": "admin-secret",
+  "cookie_secure": false,
+  "storage": "kong",
+  "cookie_domain": ".westeurope.cloudapp.azure.com"
+}
