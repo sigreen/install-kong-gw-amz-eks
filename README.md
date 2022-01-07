@@ -39,9 +39,9 @@ Once you know the Kong Admin API URL, you can execute the following deck command
 
 ```bash
 # add route + service
-deck sync -s add-route-service.yaml --kong-addr http://a17ccbc17ee414a538a58c8745233869-747933396.us-east-2.elb.amazonaws.com:8001
+deck sync -s add-route-service.yaml --kong-addr http://<admin API host>:8001
 # add graphql rate limiting
-deck sync -s add-rl-plugin.yaml --kong-addr http://a17ccbc17ee414a538a58c8745233869-747933396.us-east-2.elb.amazonaws.com:8001
+deck sync -s add-rl-plugin.yaml --kong-addr http://<admin API host>:8001
 # reset Kong to it's initial state
-deck reset --kong-addr http://a17ccbc17ee414a538a58c8745233869-747933396.us-east-2.elb.amazonaws.com:8001
+deck reset --kong-addr http://<admin API host>:8001
 ```
