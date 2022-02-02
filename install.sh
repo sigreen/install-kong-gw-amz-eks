@@ -15,7 +15,6 @@ echo -e "******************************************"
 echo
 echo -e "If you are ready go press ENTER, otherwise stop now using ctrl-c"
 read
-#. ./create_k8s_cluster.sh
 . ./create_secrets.sh
 
 cp values.yaml.template values.yaml
@@ -23,15 +22,18 @@ cp values.yaml.template values.yaml
 echo -e "\n*** Installing Kong Enterprise"
 helm install kong-enterprise kong/kong  --set ingressController.installCRDs=false -f ./values.yaml -n kong-enterprise --version 1.14.3
 
-echo -e "\n ☕ Installation done - load balancers on AWS will need a while so we'll wait now for two minutes as we need their dns entries"
+echo -e "\n ☕ Installation done - proxy load balancer on AWS will need a while so we'll wait now for two minutes as we need it's dns entries"
 sleep 120
-. ./patch_addresses.sh
 
-echo -e "\n*** Loadbalancer have been created and external dns is known - we are upgrading the Helm setup now to the created addresses"
+echo -e "\n*** Here is the proxy ingress hostname for you to create a route53 record: "
+kubectl get services -n kong-enterprise -o json | jq -r '[.items[] | {ingress:.status.loadBalancer.ingress,name:.metadata.name}]' | jq -r '.[] | select(.name|test("proxy")) | .ingress[0].hostname'
+
+echo -e "\n*** KIC has been created and address is populated - we are upgrading the Helm setup now to the created address, then waiting for 5 minutes before we create the Ingress rule"
 
 helm upgrade kong-enterprise kong/kong --set ingressController.installCRDs=false -f ./values.yaml -n kong-enterprise --version 1.14.3
+sleep 300
 
-. ./eks.sh
-. ./shared.sh
+echo -e "\n*** Creating the Kong ingress rule"
+kubectl apply -f kong-admin-ingress.yaml -n kong-enterprise
 
 rm values.yaml

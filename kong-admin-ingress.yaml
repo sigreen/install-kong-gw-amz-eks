@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: manager-admin-ingress
+  annotations:
+    konghq.com/strip-path: "true"
+spec:
+  ingressClassName: kong
+  rules:
+  - host: simon-dev.kong-se.com
+    http:
+      paths:
+      - path: /admin-api
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-enterprise-kong-admin
+            port:
+              number: 8001
+  - host: simon-dev.kong-se.com
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-enterprise-kong-manager
+            port:
+              number: 8002
+  - host: simon-portal.kong-se.com
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-enterprise-kong-portal
+            port:
+              number: 8003
+  - host: simon-portal.kong-se.com
+    http:
+      paths:
+      - path: /portal-api
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-enterprise-kong-portalapi
+            port:
+              number: 8004
+

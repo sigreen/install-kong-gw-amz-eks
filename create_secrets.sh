@@ -3,6 +3,8 @@
 echo -e "\n*** Creating namespace"
 kubectl create namespace kong-enterprise
 
+echo -e "\n*** Creating RBAC superuser"
+kubectl create secret generic kong-enterprise-superuser-password -n kong-enterprise --from-literal=password=KongRul3z!
 
 echo -e "\n*** Creating secret for sessions"
 kubectl create secret generic kong-session-config -n kong-enterprise --from-file=admin_gui_session_conf --from-file=portal_session_conf

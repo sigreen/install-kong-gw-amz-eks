@@ -2,7 +2,6 @@
   "cookie_name": "admin_session",
   "secret": "KongRul3z!",
   "cookie_secure": false,
-  "cookie_samesite": "off",
-  "cookie_domain": ".kong-se.com",
+  "cookie_samesite":"off",
   "storage": "kong"
 }
