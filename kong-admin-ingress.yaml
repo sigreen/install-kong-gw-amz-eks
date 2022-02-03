@@ -47,4 +47,14 @@ spec:
             name: kong-enterprise-kong-portalapi
             port:
               number: 8004
+  - host: simon-gw.kong-se.com
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kong-enterprise-kong-proxy
+            port:
+              number: 8000
 

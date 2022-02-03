@@ -33,6 +33,7 @@ env:
   portal_gui_host: simon-portal.kong-se.com
   portal_api_url: http://simon-portal.kong-se.com/portal-api
   portal_gui_protocol: http
+  portal_auth: basic-auth
   #Database Information
   pg_user: kong
   pg_database: kong
@@ -45,11 +46,11 @@ env:
   #      name: kong-enterprise-superuser-password #CHANGEME
   #      key: kong-password #CHANGEME
 ## Information needed for sessions (RBAC in Manager and/or Dev Portal session)
-#  portal_session_conf:
-#    valueFrom:
-#      secretKeyRef:
-#        name: kong-session-config
-#        key: portal_session_conf
+  portal_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-config
+        key: portal_session_conf
 #  session_conf_secret:
 #    valueFrom:
 #      secretKeyRef:

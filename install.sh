@@ -28,10 +28,10 @@ sleep 120
 echo -e "\n*** Here is the proxy ingress hostname for you to create a route53 record: "
 kubectl get services -n kong-enterprise -o json | jq -r '[.items[] | {ingress:.status.loadBalancer.ingress,name:.metadata.name}]' | jq -r '.[] | select(.name|test("proxy")) | .ingress[0].hostname'
 
-echo -e "\n*** KIC has been created and address is populated - we are upgrading the Helm setup now to the created address, then waiting for 5 minutes before we create the Ingress rule"
+echo -e "\n*** KIC has been created and address is populated - we are upgrading the Helm setup now to the created address, then waiting for 10 minutes before we create the Ingress rule"
 
 helm upgrade kong-enterprise kong/kong --set ingressController.installCRDs=false -f ./values.yaml -n kong-enterprise --version 1.14.3
-sleep 300
+sleep 600
 
 echo -e "\n*** Creating the Kong ingress rule"
 kubectl apply -f kong-admin-ingress.yaml -n kong-enterprise

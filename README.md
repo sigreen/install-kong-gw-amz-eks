@@ -35,7 +35,7 @@ kubectl get all
 ./install.sh
 ```
 
-7. Via the AWS web console, update your Route53. In my example, I use `*.kong-se.com` as the Record Name, Record type=A, and for Value I use "Alias to Netowrk Load Balancer" and set it to the hostname output from step 6.
+7. Via the AWS web console, update your Route53. In my example, I create separate records for `simon-dev.kong-se.com`, `simon-portal.kong-se.com` and `simon-gw.kong-se.com`  as the Record Name, Record type=A, and for Value I use "Alias to Netowrk Load Balancer" and set it to the hostname output from step 6.  `simon-dev` and `simon-portal` point to the Ingress rule Address, and `simon-gw` points directly to the `kong-enterprise-kong-proxy` service address.
 
 8. Verify the Kong ingress rule in K9s or similar.  The `Address` field should be populated like so:
 
@@ -46,6 +46,8 @@ kubectl get all
 * http://simon-dev.kong-se.com (u: kong_admin p: KongRul3z!)
 
 10. Kong Dev Portal can be reached at `http://simon-portal.kong-se.com` once Dev Portal has been enabled via the Manager.
+
+11. API requests can be posted to `simon-gw.kong-se.com`.
 
 ## Deck commands
 
